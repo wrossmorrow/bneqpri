@@ -435,7 +435,8 @@ with any questions.
 
     if S.solved : 
 
-        log( f"Solved in {S.iter}/{S.max_iter} steps, {S.time} seconds, |p-c-z| = {S.nrms[-1]}" )
+        log( f"Solved in {S.iter}/{S.max_iter} steps, {S.time} seconds" )
+        log( f"fixed-point satisfaction |p-c-z| = {S.nrms[-1]}" )
         with open( sys.argv[4] , "w" ) as file: 
             file.write(f"{p[0]}")
             for j in range(1,J):

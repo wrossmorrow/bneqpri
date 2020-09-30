@@ -47,10 +47,11 @@ with any questions.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-2020-09-29T22:07:57.901019 :: Preparing data
-2020-09-29T22:07:57.901097 :: Starting solve
-2020-09-29T22:07:58.595876 :: Solved in 14/1000 steps, 0.6947450637817383 seconds, |p-c-z| = 2.27665303687008e-06
-2020-09-29T22:07:58.596230 :: (probable) equilibium prices written to prices.csv
+2020-09-29T22:27:54.974576 :: Preparing data
+2020-09-29T22:27:54.974648 :: Starting solve
+2020-09-29T22:27:55.576735 :: Solved in 14/1000 steps, 0.6020591259002686 seconds
+2020-09-29T22:27:55.576809 :: fixed-point satisfaction |p-c-z| = 2.27665303687008e-06
+2020-09-29T22:27:55.577832 :: (probable) equilibium prices written to prices.csv
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ```
