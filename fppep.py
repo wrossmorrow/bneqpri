@@ -31,8 +31,15 @@ Bertrand-Nash Equilibrium Prices with Budgets (Finite Purchasing Power)
 
 Method from: 
 
-  Morrow, W.R. Finite purchasing power and computations of Bertrand–Nash equilibrium prices. 
-  Comput Optim Appl 62, 477–515 (2015). https://doi.org/10.1007/s10589-015-9743-7
+( Morrow, W.R. Finite purchasing power and computations of Bertrand–Nash equilibrium prices. )
+( Comput Optim Appl 62, 477–515 (2015). https://doi.org/10.1007/s10589-015-9743-7            )
+
+Currently only uses the utility function 
+
+U[i,j] = a[i] log( b[i] - p[j] ) + V[i,j]
+
+where a[i] is individual i's price sensitivity, b[i] is their budget, p[j] is the 
+price of product j, and V[i,j] is the total of all non-price components of utility.
 
 Note this software is provided AS-IS under the GPL v2.0 License. Contact the author
 with any questions. 

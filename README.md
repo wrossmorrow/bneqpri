@@ -84,19 +84,25 @@ Bertrand-Nash Equilibrium Prices with Budgets (Finite Purchasing Power)
 
 Method from: 
 
-Morrow, W.R. Finite purchasing power and computations of Bertrand–Nash equilibrium prices. 
-Comput Optim Appl 62, 477–515 (2015). https://doi.org/10.1007/s10589-015-9743-7
+( Morrow, W.R. Finite purchasing power and computations of Bertrand–Nash equilibrium prices. )
+( Comput Optim Appl 62, 477–515 (2015). https://doi.org/10.1007/s10589-015-9743-7            )
+
+Currently only uses the utility function 
+
+U[i,j] = a[i] log( b[i] - p[j] ) + V[i,j]
+
+where a[i] is individual i's price sensitivity, b[i] is their budget, p[j] is the 
+price of product j, and V[i,j] is the total of all non-price components of utility.
 
 Note this software is provided AS-IS under the GPL v2.0 License. Contact the author
 with any questions. 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-2020-09-29T22:27:54.974576 :: Preparing data
-2020-09-29T22:27:54.974648 :: Starting solve
-2020-09-29T22:27:55.576735 :: Solved in 14/1000 steps, 0.6020591259002686 seconds
-2020-09-29T22:27:55.576809 :: fixed-point satisfaction |p-c-z| = 2.27665303687008e-06
-2020-09-29T22:27:55.577832 :: (probable) equilibium prices written to prices.csv
+2020-09-30T07:10:25.817446 :: Modeling 500 individuals, 3 firms, 37 products
+2020-09-30T07:10:25.864241 :: Solved in 1/1000 steps, 0.046675920486450195 seconds
+2020-09-30T07:10:25.864274 :: fixed-point satisfaction |p-c-z| = 6.8332302038953685e-09
+2020-09-30T07:10:25.864576 :: (probable) equilibium prices written to new-prices.csv
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ```
@@ -108,7 +114,6 @@ Detailed README content TBD
 # TBD
 
 * Tons more tests
-* Implement `argparse` for good options
 * Implement second-order sufficiency check for computed prices
 * Figure out why `numpy` syntax isn't computing `G'm` terms correctly
 * Turn into a proper package
