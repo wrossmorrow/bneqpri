@@ -22,7 +22,7 @@ The utilities file is the most complicated, having as many rows as the number of
 
 The utility function for choices used here is, for now, presumed to be 
 ```
-	U[i,j(p) = a[i] log( b[i] - p ) + V[i,j]
+U[i,j](p) = a[i] log( b[i] - p ) + V[i,j]
 ```
 There is an outside good with unit value; any non unit value should be absorbed into the non-price utility. A word of warning, the price sensitivity _must be_ positive for all individuals and _probably_ needs to be larger than one for all individuals. 
 
