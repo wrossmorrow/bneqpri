@@ -42,7 +42,7 @@ where a[i] is individual i's price sensitivity, b[i] is their budget, p[j] is th
 price of product j, and V[i,j] is the total of all non-price components of utility.
 
 Note this software is provided AS-IS under the GPL v2.0 License. Contact the author
-with any questions. 
+with any questions. Copyright 2020+ W. Ross Morrow. 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 """
