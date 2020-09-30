@@ -76,7 +76,7 @@ Example files of each are provided in the `example` directory here.
 With such files, run the code as follows: 
 
 ```
-$ python fppep.py example/firms.csv example/products.csv example/utilities.csv prices.csv
+$ python fppep.py --firms example/firms.csv --products example/products.csv --individuals example/utilities.csv --prices prices.csv
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -102,7 +102,7 @@ with any questions. Copyright 2020+ W. Ross Morrow.
 2020-09-30T07:10:25.817446 :: Modeling 500 individuals, 3 firms, 37 products
 2020-09-30T07:10:25.864241 :: Solved in 1/1000 steps, 0.046675920486450195 seconds
 2020-09-30T07:10:25.864274 :: fixed-point satisfaction |p-c-z| = 6.8332302038953685e-09
-2020-09-30T07:10:25.864576 :: (probable) equilibium prices written to new-prices.csv
+2020-09-30T07:10:25.864576 :: (probable) equilibium prices written to prices.csv
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ```
