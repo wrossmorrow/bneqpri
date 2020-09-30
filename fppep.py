@@ -409,6 +409,24 @@ if __name__ == "__main__":
 
     I, J, F, Jf, b, a, V, c = read_data_files(sys.argv[1], sys.argv[2], sys.argv[3])
 
+
+    print( """
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Bertrand-Nash Equilibrium Prices with Budgets (Finite Purchasing Power)
+
+Method from: 
+
+  Morrow, W.R. Finite purchasing power and computations of Bertrand–Nash equilibrium prices. 
+  Comput Optim Appl 62, 477–515 (2015). https://doi.org/10.1007/s10589-015-9743-7
+
+Note this software is provided AS-IS under the GPL v2.0 License. Contact the author
+with any questions. 
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+""" )
+
+
     log( f"Preparing data" )
     S = FPISolver(I, J, F, Jf, b, a, V, c)
 
@@ -428,5 +446,9 @@ if __name__ == "__main__":
     else: 
 
         log( f"Failed to solve in {S.max_iter} steps, {S.time} seconds." )
+
+    print( """
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+""" )
 
 
