@@ -18,10 +18,27 @@
 """
 
 import sys
+import argparse
 from time import time
 import numpy as np
 
 from datetime import datetime as dt
+
+header = """
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Bertrand-Nash Equilibrium Prices with Budgets (Finite Purchasing Power)
+
+Method from: 
+
+  Morrow, W.R. Finite purchasing power and computations of Bertrand–Nash equilibrium prices. 
+  Comput Optim Appl 62, 477–515 (2015). https://doi.org/10.1007/s10589-015-9743-7
+
+Note this software is provided AS-IS under the GPL v2.0 License. Contact the author
+with any questions. 
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+"""
 
 def now():
     return dt.now().isoformat()
@@ -31,7 +48,7 @@ def log(msg):
 
 class FPISolver(): 
     
-    def __init__(self, I, J, F, Jf, Bi, a, V, c, f_tol=1.0e-6, r_tol=1.0e-6, max_iter=1000): 
+    def __init__(self, I, J, F, Jf, Bi, a, V, c): 
         
         """
         
@@ -59,11 +76,6 @@ class FPISolver():
         self.a  = a  # price sensitivity
         self.V  = V  # "fized" portion of utility (non-price part)
         self.c  = c  # (unit) costs for each product
-        
-        # iteration options
-        self.f_tol    = f_tol
-        self.r_tol    = r_tol
-        self.max_iter = max_iter
         
         # internal data
         
@@ -288,11 +300,7 @@ class FPISolver():
             dh[h] = np.abs( df - cg ).max()
             print( "  %0.8e: %0.2f %0.10f" % ( H , np.log10(dh[h]) , dh[h] ) )
 
-    def solve(self, p0=None, f_tol=None, r_tol=None, max_iter=None, verbose=False, check=False):
-
-        f_tol = self.f_tol if f_tol is None else f_tol
-        r_tol = self.r_tol if r_tol is None else r_tol
-        max_iter = self.max_iter if max_iter is None else max_iter 
+    def solve(self, p0=None, f_tol=1.0e-6, r_tol=1.0e-6, max_iter=1000, verbose=False, check=False):
         
         if p0 is None: # random prices in [ c/2 , 3/2c ]
             p = self.c/2.0 + 2.0*np.random.random(J)
@@ -333,7 +341,7 @@ Iteration {self.iter}:
 
         self.time = time() - start
             
-        self.nrms = self.nrms[:self.iter]
+        self.nrms = self.nrms[:self.iter+1]
 
         return p
         
@@ -404,51 +412,143 @@ def read_data_files( firms , products , utilities ):
 
     return I, J, F, Jf, b, a, V, c
 
+def read_initial_prices( prices ):
+
+    with open( prices , "r" ) as file: 
+        headers = file.readline()
+        content = [ f.strip() for f in file.readline().split(',') ]
+        p = np.zeros(len(content))
+        for j in range(len(content)): 
+            p[j] = float(content[j])
+        return p
+
+def cli():
+
+    parser = argparse.ArgumentParser(description=header, formatter_class=argparse.RawTextHelpFormatter)
+
+    parser.add_argument(
+        '--format', 
+        type=str, 
+        choices=["sequential","indexed"],
+        default="sequential",
+        help="""Format input files are written in. Sequential presumes firms' products 
+are listed sequentially, indexed means the header for product and individual file has _
+indices describing the firm and product for the column. NOT YET IMPLEMENTED."""
+    )
+
+    parser.add_argument(
+        '--firms', 
+        type=str, 
+        help='File describing the number of firms and the number of products they each offer'
+    )
+
+    parser.add_argument(
+        '--products', 
+        type=str, 
+        help='File describing the number of products and their unit costs'
+    )
+
+    parser.add_argument(
+        '--individuals', 
+        type=str, 
+        help='File describing the number of individuals, their budgets, price sensitivities, and utilities'
+    )
+
+    parser.add_argument(
+        '--initial-prices', 
+        type=str, 
+        help='File with initial prices to use when starting iterations'
+    )
+
+    parser.add_argument(
+        '--prices', 
+        type=str, 
+        default="prices.csv",
+        help='File with the computed prices, written upon solve'
+    )
+
+    parser.add_argument(
+        '--ftol', 
+        type=float, 
+        default=1.0e-6,
+        help='Solve tolerance, will terminate when |p-c-z(p)| < ftol'
+    )
+
+    parser.add_argument(
+        '--iters', 
+        type=int, 
+        default=1000,
+        help='Maximum number of iterations'
+    )
+
+    parser.add_argument(
+        '-q', '--quiet', 
+        action='store_true', 
+        default=False,
+        help="Don't print information to the console"
+    )
+
+    args = parser.parse_args()
+    args.verbose = not args.quiet
+
+    return args
+
 
 if __name__ == "__main__": 
 
-    I, J, F, Jf, b, a, V, c = read_data_files(sys.argv[1], sys.argv[2], sys.argv[3])
+    args = cli()
 
+    if args.firms is None: 
+        print( f"\n{sys.argv[0]} requires a firms file (--firms)\n" )
+        exit(1)
+    if args.products is None: 
+        print( f"\n{sys.argv[0]} requires a products file (--products)\n" )
+        exit(1)
+    if args.individuals is None: 
+        print( f"\n{sys.argv[0]} requires an individuals file (--individuals)\n" )
+        exit(1)
 
-    print( """
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    I, J, F, Jf, b, a, V, c = read_data_files(args.firms, args.products, args.individuals)
 
-Bertrand-Nash Equilibrium Prices with Budgets (Finite Purchasing Power)
+    if args.verbose: 
+        print( header )
 
-Method from: 
-
-  Morrow, W.R. Finite purchasing power and computations of Bertrand–Nash equilibrium prices. 
-  Comput Optim Appl 62, 477–515 (2015). https://doi.org/10.1007/s10589-015-9743-7
-
-Note this software is provided AS-IS under the GPL v2.0 License. Contact the author
-with any questions. 
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-""" )
-
-
-    log( f"Preparing data" )
     S = FPISolver(I, J, F, Jf, b, a, V, c)
 
-    log( f"Starting solve" )
-    p = S.solve( p0=c , verbose=False )
+    if args.verbose: 
+        log( f"Modeling {S.I} individuals, {S.F} firms, {S.J} products" )
+
+    if args.initial_prices is not None: 
+        p0 = read_initial_prices( args.initial_prices )
+    else: 
+        p0 = c
+
+    p = S.solve( p0=p0 , f_tol=args.ftol , max_iter=args.iters, verbose=False )
 
     if S.solved : 
 
-        log( f"Solved in {S.iter}/{S.max_iter} steps, {S.time} seconds" )
-        log( f"fixed-point satisfaction |p-c-z| = {S.nrms[-1]}" )
-        with open( sys.argv[4] , "w" ) as file: 
+        if args.verbose: 
+            log( f"Solved in {S.iter}/{args.iters} steps, {S.time} seconds" )
+            log( f"fixed-point satisfaction |p-c-z| = {S.nrms[-1]}" )
+        with open( args.prices , "w" ) as file: 
+            file.write(f"price_0")
+            for j in range(1,J):
+                file.write(f",price_{j}")
+            file.write("\n")
             file.write(f"{p[0]}")
             for j in range(1,J):
                 file.write(f",{p[j]}")
             file.write("\n")
-        log( f"(probable) equilibium prices written to {sys.argv[4]}" )
+        if args.verbose: 
+            log( f"(probable) equilibium prices written to {args.prices}" )
 
     else: 
 
-        log( f"Failed to solve in {S.max_iter} steps, {S.time} seconds." )
+        if args.verbose: 
+            log( f"Failed to solve in {args.iters} steps, {S.time} seconds." )
 
-    print( """
+    if args.verbose: 
+        print( """
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 """ )
 

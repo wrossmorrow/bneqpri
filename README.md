@@ -2,6 +2,51 @@
 
 Python code for computing equilibrium prices
 
+# Dependencies
+
+This requires `python3` and `numpy`. 
+
+# Command-Line Usage
+
+```
+(base) mememe:eqpri morrowwr$ python fppep.py --help
+usage: fppep.py [-h] [--format {sequential,indexed}] [--firms FIRMS]
+                [--products PRODUCTS] [--individuals INDIVIDUALS]
+                [--initial-prices INITIAL_PRICES] [--prices PRICES]
+                [--ftol FTOL] [--iters ITERS] [-q]
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Bertrand-Nash Equilibrium Prices with Budgets (Finite Purchasing Power)
+
+Method from: 
+
+  Morrow, W.R. Finite purchasing power and computations of Bertrand–Nash equilibrium prices. 
+  Comput Optim Appl 62, 477–515 (2015). https://doi.org/10.1007/s10589-015-9743-7
+
+Note this software is provided AS-IS under the GPL v2.0 License. Contact the author
+with any questions. 
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --format {sequential,indexed}
+                        Format input files are written in. Sequential presumes firms' products 
+                        are listed sequentially, indexed means the header for product and individual file has _
+                        indices describing the firm and product for the column. NOT YET IMPLEMENTED.
+  --firms FIRMS         File describing the number of firms and the number of products they each offer
+  --products PRODUCTS   File describing the number of products and their unit costs
+  --individuals INDIVIDUALS
+                        File describing the number of individuals, their budgets, price sensitivities, and utilities
+  --initial-prices INITIAL_PRICES
+                        File with initial prices to use when starting iterations
+  --prices PRICES       File with the computed prices, written upon solve
+  --ftol FTOL           Solve tolerance, will terminate when |p-c-z(p)| < ftol
+  --iters ITERS         Maximum number of iterations
+  -q, --quiet           Don't print information to the console
+```
+
 # Quick Start
 
 Run by specifying three `csv` files, describing the firm structure, the products (costs only now), and the utilities. 
@@ -64,6 +109,7 @@ Detailed README content TBD
 
 * Tons more tests
 * Implement `argparse` for good options
+* Implement second-order sufficiency check for computed prices
 * Figure out why `numpy` syntax isn't computing `G'm` terms correctly
 * Turn into a proper package
 
