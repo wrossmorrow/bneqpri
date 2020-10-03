@@ -1,6 +1,6 @@
 # bneqpri
 
-Python code for computing equilibrium prices
+Python code for computing Bertrand-Nash equilibrium prices with "mixed" logit models. The implemented method is the fixed-point iteration derived and discussed in the papers (Fixed-Point Approaches to Computing Bertrand-Nash Equilibrium Prices Under Mixed-Logit Demand)[https://doi.org/10.1287/opre.1100.0894] and (Finite purchasing power and computations of Bertrand–Nash equilibrium prices)[https://doi.org/10.1007/s10589-015-9743-7]. 
 
 # Dependencies
 
