@@ -1,3 +1,7 @@
 .ipynb*
+*.ipynb
 __pycache__
 /*.csv
+*egg*
+/dist
+/build
