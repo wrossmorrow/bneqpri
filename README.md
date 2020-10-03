@@ -14,6 +14,13 @@ This project is on [pypi](https://pypi.org/project/bneqpri/) and thus you can us
 $ pip install bneqpri
 ```
 
+If you want to build from the repo, do 
+
+```
+$ python setup.py sdist bdist_wheel
+$ pip install --find-links ./dist/
+```
+
 # Command-Line Usage
 
 ```
