@@ -112,80 +112,80 @@ $ bash examples.sh
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-2020-10-02T20:09:19.011956 :: Modeling 1000 individuals, 10 firms, 144 products, linear utility no budget
-2020-10-02T20:09:19.526557 :: Solved in 34/1000 steps, 0.5145268440246582 seconds
-2020-10-02T20:09:19.526595 :: fixed-point satisfaction |p-c-z| = 7.961977299686396e-09
-2020-10-02T20:09:19.527064 :: (probable) equilibium prices written to examples/linear/1000-10-144//prices.csv
+2020-10-02T20:26:37.144882 :: Modeling 1000 individuals, 10 firms, 144 products, linear utility no budget
+2020-10-02T20:26:37.687914 :: Solved in 34/1000 steps, 0.542978048324585 seconds
+2020-10-02T20:26:37.687948 :: fixed-point satisfaction |p-c-z| = 7.961977299686396e-09
+2020-10-02T20:26:37.688401 :: (probable) equilibium prices written to examples/linear/1000-10-144/prices.csv
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-2020-10-02T20:09:19.752497 :: Modeling 1000 individuals, 5 firms, 79 products, linear utility no budget
-2020-10-02T20:09:20.105496 :: Solved in 28/1000 steps, 0.3529479503631592 seconds
-2020-10-02T20:09:20.105529 :: fixed-point satisfaction |p-c-z| = 8.772539583645766e-09
-2020-10-02T20:09:20.105973 :: (probable) equilibium prices written to examples/linear/1000-5-79//prices.csv
+2020-10-02T20:26:37.918779 :: Modeling 1000 individuals, 5 firms, 79 products, linear utility no budget
+2020-10-02T20:26:38.287736 :: Solved in 28/1000 steps, 0.36890220642089844 seconds
+2020-10-02T20:26:38.287766 :: fixed-point satisfaction |p-c-z| = 8.772539583645766e-09
+2020-10-02T20:26:38.288218 :: (probable) equilibium prices written to examples/linear/1000-5-79/prices.csv
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-2020-10-02T20:09:20.279930 :: Modeling 50 individuals, 3 firms, 53 products, linear utility no budget
-2020-10-02T20:09:20.342641 :: Solved in 44/1000 steps, 0.06260204315185547 seconds
-2020-10-02T20:09:20.342679 :: fixed-point satisfaction |p-c-z| = 6.891536230568818e-09
-2020-10-02T20:09:20.343049 :: (probable) equilibium prices written to examples/linear/50-3-53//prices.csv
+2020-10-02T20:26:38.465683 :: Modeling 50 individuals, 3 firms, 53 products, linear utility no budget
+2020-10-02T20:26:38.532921 :: Solved in 44/1000 steps, 0.06718897819519043 seconds
+2020-10-02T20:26:38.532958 :: fixed-point satisfaction |p-c-z| = 6.891536230568818e-09
+2020-10-02T20:26:38.533299 :: (probable) equilibium prices written to examples/linear/50-3-53/prices.csv
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-2020-10-02T20:09:20.534591 :: Modeling 500 individuals, 3 firms, 40 products, linear utility no budget
-2020-10-02T20:09:20.989304 :: Solved in 78/1000 steps, 0.45466113090515137 seconds
-2020-10-02T20:09:20.989340 :: fixed-point satisfaction |p-c-z| = 8.38127345303974e-09
-2020-10-02T20:09:20.989679 :: (probable) equilibium prices written to examples/linear/500-3-40//prices.csv
+2020-10-02T20:26:38.730063 :: Modeling 500 individuals, 3 firms, 40 products, linear utility no budget
+2020-10-02T20:26:39.188571 :: Solved in 78/1000 steps, 0.4584488868713379 seconds
+2020-10-02T20:26:39.188606 :: fixed-point satisfaction |p-c-z| = 8.38127345303974e-09
+2020-10-02T20:26:39.188918 :: (probable) equilibium prices written to examples/linear/500-3-40/prices.csv
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-2020-10-02T20:09:21.249497 :: Modeling 1000 individuals, 10 firms, 148 products, nonlinear utility with budget
-2020-10-02T20:09:32.021934 :: Solved in 32/1000 steps, 10.772387981414795 seconds
-2020-10-02T20:09:32.021968 :: fixed-point satisfaction |p-c-z| = 8.289176345321891e-09
-2020-10-02T20:09:32.022484 :: (probable) equilibium prices written to examples/budgets/1000-10-148//prices.csv
+2020-10-02T20:26:39.457582 :: Modeling 1000 individuals, 10 firms, 148 products, nonlinear utility with budget
+2020-10-02T20:26:51.156455 :: Solved in 32/1000 steps, 11.698816061019897 seconds
+2020-10-02T20:26:51.156493 :: fixed-point satisfaction |p-c-z| = 8.289176345321891e-09
+2020-10-02T20:26:51.156979 :: (probable) equilibium prices written to examples/budgets/1000-10-148/prices.csv
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-2020-10-02T20:09:32.252172 :: Modeling 1000 individuals, 5 firms, 68 products, nonlinear utility with budget
-2020-10-02T20:09:44.043457 :: Solved in 73/1000 steps, 11.791236162185669 seconds
-2020-10-02T20:09:44.043489 :: fixed-point satisfaction |p-c-z| = 9.146744250898564e-09
-2020-10-02T20:09:44.043839 :: (probable) equilibium prices written to examples/budgets/1000-5-68//prices.csv
+2020-10-02T20:26:51.393449 :: Modeling 1000 individuals, 5 firms, 68 products, nonlinear utility with budget
+2020-10-02T20:27:03.496671 :: Solved in 73/1000 steps, 12.103170156478882 seconds
+2020-10-02T20:27:03.496717 :: fixed-point satisfaction |p-c-z| = 9.146744250898564e-09
+2020-10-02T20:27:03.497178 :: (probable) equilibium prices written to examples/budgets/1000-5-68/prices.csv
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-2020-10-02T20:09:44.237175 :: Modeling 50 individuals, 3 firms, 41 products, nonlinear utility with budget
-2020-10-02T20:09:44.363257 :: Solved in 20/1000 steps, 0.12602996826171875 seconds
-2020-10-02T20:09:44.363291 :: fixed-point satisfaction |p-c-z| = 5.774188682750037e-09
-2020-10-02T20:09:44.363713 :: (probable) equilibium prices written to examples/budgets/50-3-41//prices.csv
+2020-10-02T20:27:03.689047 :: Modeling 50 individuals, 3 firms, 41 products, nonlinear utility with budget
+2020-10-02T20:27:03.818524 :: Solved in 20/1000 steps, 0.12943220138549805 seconds
+2020-10-02T20:27:03.818557 :: fixed-point satisfaction |p-c-z| = 5.774188682750037e-09
+2020-10-02T20:27:03.818899 :: (probable) equilibium prices written to examples/budgets/50-3-41/prices.csv
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-2020-10-02T20:09:44.566969 :: Modeling 500 individuals, 3 firms, 44 products, nonlinear utility with budget
-2020-10-02T20:09:48.822381 :: Solved in 78/1000 steps, 4.255356073379517 seconds
-2020-10-02T20:09:48.822420 :: fixed-point satisfaction |p-c-z| = 8.66341531846615e-09
-2020-10-02T20:09:48.822726 :: (probable) equilibium prices written to examples/budgets/500-3-44//prices.csv
+2020-10-02T20:27:04.019609 :: Modeling 500 individuals, 3 firms, 44 products, nonlinear utility with budget
+2020-10-02T20:27:08.500028 :: Solved in 78/1000 steps, 4.48035192489624 seconds
+2020-10-02T20:27:08.500067 :: fixed-point satisfaction |p-c-z| = 8.66341531846615e-09
+2020-10-02T20:27:08.500400 :: (probable) equilibium prices written to examples/budgets/500-3-44/prices.csv
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 ```
