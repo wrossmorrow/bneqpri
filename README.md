@@ -1,10 +1,18 @@
-# eqpri
+# bneqpri
 
 Python code for computing equilibrium prices
 
 # Dependencies
 
 This requires `python3` and `numpy`. 
+
+# Installation
+
+This project is on [pypi](https://pypi.org/project/bneqpri/) and thus you can use `pip`: 
+
+```
+$ pip install bneqpri
+```
 
 # Command-Line Usage
 
@@ -184,7 +192,6 @@ Detailed README content TBD
 * Tons more tests
 * Implement second-order sufficiency check for computed prices
 * Figure out why `numpy` syntax isn't computing `G'm` terms correctly
-* Turn into a proper package
 
 # Contact
 
