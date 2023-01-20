@@ -16,5 +16,11 @@
     Copyright W. Ross Morrow (morrowwr@gmail.com), 2020+
 
 """
+import logging
 
-__version__ = "0.1.0"
+logging.basicConfig(
+    format="%(asctime)s - %(message)s",
+    datefmt="%d-%b-%y %H:%M:%S",
+    encoding="utf-8",
+    level=logging.INFO,
+)

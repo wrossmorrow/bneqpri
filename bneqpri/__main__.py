@@ -16,69 +16,83 @@
     Copyright W. Ross Morrow (morrowwr@gmail.com), 2020+
 
 """
+from logging import getLogger
 
-from bneqpri.cli import cli , header
-from bneqpri.io import read_data_files , read_initial_prices , write_prices
-from bneqpri.logging import log
-from bneqpri.impl import BUFPISolver , LUFPISolver
+from .cli import cli, header
+from .config import read_data_files, read_initial_prices, write_prices
+from .solver import FPISolver
+from .impl import (
+    LinearUtilityFPISolver,
+    LogOfRemainingUtilityFPISolver,
+)
 
-if __name__ == "__main__": 
+logger = getLogger(__name__)
+
+
+if __name__ == "__main__":
 
     args = cli()
 
-    if args.firms is None: 
-        print( f"\nbneqpri requires a firms file (--firms)\n" )
+    if args.firms is None:
+        logger.error("\nbneqpri requires a firms file (--firms)\n")
         exit(1)
 
-    if args.products is None: 
-        print( f"\nbneqpri requires a products file (--products)\n" )
+    if args.products is None:
+        logger.error("\nbneqpri requires a products file (--products)\n")
         exit(1)
 
-    if args.individuals is None: 
-        print( f"\nbneqpri requires an individuals file (--individuals)\n" )
+    if args.individuals is None:
+        logger.error("\nbneqpri requires an individuals file (--individuals)\n")
         exit(1)
 
-    if args.header: 
-        print( header )
-    elif args.verbose: 
-        print( """
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-""" )
+    if args.header:
+        print(header)
+    elif args.verbose:
+        print(
+            """
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+"""
+        )
 
-    if args.linear: 
+    S: FPISolver
+    if args.linear:
         I, J, F, Jf, a, V, c = read_data_files(args.firms, args.products, args.individuals)
-        S = LUFPISolver(I, J, F, Jf, a, V, c)
+        S = LinearUtilityFPISolver(I, J, F, Jf, a, V, c)
         extra = ", linear utility no budget"
-    else: 
-        I, J, F, Jf, b, a, V, c = read_data_files(args.firms, args.products, args.individuals, budget=True)
-        S = BUFPISolver(I, J, F, Jf, b, a, V, c)
-        extra = ", nonlinear utility with budget"
+    else:
+        I, J, F, Jf, b, a, V, c = read_data_files(
+            args.firms, args.products, args.individuals, budget=True
+        )
+        S = LogOfRemainingUtilityFPISolver(I, J, F, Jf, b, a, V, c)
+        extra = ", log-of-remaining-utility with budget"
 
-    if args.verbose: 
-        log( f"Modeling {S.I} individuals, {S.F} firms, {S.J} products{extra}" )
+    if args.verbose:
+        logger.info(f"Modeling {S.I} individuals, {S.F} firms, {S.J} products{extra}")
 
-    if args.initial_prices is not None: 
-        p0 = read_initial_prices( args.initial_prices )
-    else: 
+    if args.initial_prices is not None:
+        p0 = read_initial_prices(args.initial_prices)
+    else:
         p0 = c
 
-    p = S.solve( p0=p0 , f_tol=args.ftol , max_iter=args.iters, verbose=False )
+    p = S.solve(p0=p0, f_tol=args.ftol, max_iter=args.iters, verbose=False)
 
-    if S.solved : 
+    if S.solved:
 
-        if args.verbose: 
-            log( f"Solved in {S.iter}/{args.iters} steps, {S.time} seconds" )
-            log( f"fixed-point satisfaction |p-c-z| = {S.nrms[-1]}" )
-        write_prices( args.prices , p )
-        if args.verbose: 
-            log( f"(probable) equilibium prices written to {args.prices}" )
+        if args.verbose:
+            logger.info(f"Solved in {S.iter}/{args.iters} steps, {S.time} seconds")
+            logger.info(f"fixed-point satisfaction |p-c-z| = {S.nrms[-1]}")
+        write_prices(args.prices, p)
+        if args.verbose:
+            logger.info(f"(probable) equilibium prices written to {args.prices}")
 
-    else: 
+    else:
 
-        if args.verbose: 
-            log( f"Failed to solve in {args.iters} steps, {S.time} seconds." )
+        if args.verbose:
+            logger.error(f"Failed to solve in {args.iters} steps, {S.time} seconds.")
 
-    if args.verbose: 
-        print( """
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-""" )
+    if args.verbose:
+        print(
+            """
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+"""
+        )

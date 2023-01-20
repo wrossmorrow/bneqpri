@@ -1,0 +1,6 @@
+[flake8]
+import-order-style = smarkets
+application-import-names = pygrpc
+max-line-length = 120
+extend-ignore = E501
+exclude = [.venv, .mypy_cache, proto]

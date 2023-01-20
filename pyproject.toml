@@ -1,0 +1,35 @@
+[tool.black]
+line-length = 99
+target-version = ['py38']
+
+[tool.poetry]
+name = "bneqpri"
+version = "0.2.0"
+description = "Fixed-Point Methods for Computing Equilibrium Prices"
+readme = "README.md"
+packages = [{ include = "bneqpri" }]
+authors = ["W. Ross Morrow <morrowwr@gmail.com>"]
+
+[[tool.poetry.source]]
+name = 'default'
+url = 'https://pypi.python.org/simple'
+default = true
+
+[tool.poetry.dependencies]
+python  = "^3.9"
+numpy = "^1.23.3"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1.2"
+black = "^22.6.0"
+flake8 = "^4.0.1"
+
+mypy = "^0.971"
+# TODO: this is a very loose setting, would be better to target
+[tool.mypy]
+ignore_missing_imports = true
+plugins = "numpy.typing.mypy_plugin"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
