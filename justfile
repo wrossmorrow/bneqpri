@@ -62,6 +62,6 @@ integration-test *flags:
 build: 
     poetry build
 
-# # publish the package
-# publish *flags:
-#     poetry publish {{flags}}
+# publish the package
+publish *flags:
+    poetry publish {{flags}}

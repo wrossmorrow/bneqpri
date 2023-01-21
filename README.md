@@ -1,25 +1,33 @@
 # bneqpri
 
-Python code for computing Bertrand-Nash equilibrium prices with "mixed" logit models. The implemented method is the fixed-point iteration derived and discussed in the papers [Fixed-Point Approaches to Computing Bertrand-Nash Equilibrium Prices Under Mixed-Logit Demand](https://doi.org/10.1287/opre.1100.0894) (_Operations Research_, 2011) and [Finite purchasing power and computations of Bertrand–Nash equilibrium prices](https://doi.org/10.1007/s10589-015-9743-7) (_Computational Optimization and Applications_, 2015). 
+Python code for computing Bertrand-Nash equilibrium prices with "mixed" logit models. The implemented method is the fixed-point iteration derived and discussed in the papers [Fixed-Point Approaches to Computing Bertrand-Nash Equilibrium Prices Under Mixed-Logit Demand](https://doi.org/10.1287/opre.1100.0894) (_Operations Research_, 2011) and [Finite purchasing power and computations of Bertrand–Nash equilibrium prices](https://doi.org/10.1007/s10589-015-9743-7) (_Computational Optimization and Applications_, 2015); there's also a super verbose working paper on the [arxiv](https://arxiv.org/abs/1012.5836). You can get the whole gist from the first paper, the second introduces finer grained details related to treatment of "budgets" in the choice model (under regularity conditions). The basic idea is that there is a _particular_ fixed-point equation for simultaneous stationarity (the _necessary_ conditions for equilibrium prices) that is provably norm-coercive and generates steps that are never orthogonal to the combined-gradient. Iterating such steps appears to be a strong alternative to Newton-type methods as discussed at some length in the papers, although there is no convergence proof. 
 
 # Dependencies
 
-This requires `python3` and `numpy`. 
+Using this repo requires `python3` and `numpy`. 
 
 # Installation
 
 This project is on [pypi](https://pypi.org/project/bneqpri/) and thus you can use `pip`: 
-
-```
-$ pip install bneqpri
+```shell
+pip install bneqpri
 ```
 
 If you want to build from the repo, do 
+```shell
+just build
+```
+if you have [`just`](https://github.com/casey/just). Or
+```shell
+poetry build
+```
+with [`poetry`](https://python-poetry.org/). 
 
+You can run tests with 
+```shell
+just unit-test
 ```
-$ python setup.py sdist bdist_wheel
-$ pip install --find-links ./dist/
-```
+or review the standard-ish `pytest` command in the `justfile`. 
 
 # Command-Line Usage
 
