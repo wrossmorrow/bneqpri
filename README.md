@@ -1,6 +1,6 @@
 # bneqpri
 
-Python code for computing Bertrand-Nash equilibrium prices with "mixed" logit models. The implemented method is the fixed-point iteration derived and discussed in the papers [Fixed-Point Approaches to Computing Bertrand-Nash Equilibrium Prices Under Mixed-Logit Demand](https://doi.org/10.1287/opre.1100.0894) (_Operations Research_, 2011) and [Finite purchasing power and computations of Bertrand–Nash equilibrium prices](https://doi.org/10.1007/s10589-015-9743-7) (_Computational Optimization and Applications_, 2015); there's also a super verbose working paper on the [arxiv](https://arxiv.org/abs/1012.5836). You can get the whole gist from the first paper, the second introduces finer grained details related to treatment of "budgets" in the choice model (under regularity conditions). The basic idea is that there is a _particular_ fixed-point equation for simultaneous stationarity (the _necessary_ conditions for equilibrium prices) that is provably norm-coercive and generates steps that are never orthogonal to the combined-gradient. Iterating such steps appears to be a strong alternative to Newton-type methods as discussed at some length in the papers, although there is no convergence proof. 
+Python code for computing Bertrand-Nash equilibrium prices with "mixed" logit models. The implemented method is the fixed-point iteration derived and discussed in the papers [Fixed-Point Approaches to Computing Bertrand-Nash Equilibrium Prices Under Mixed-Logit Demand](https://doi.org/10.1287/opre.1100.0894) (_Operations Research_, 2011) and [Finite purchasing power and computations of Bertrand–Nash equilibrium prices](https://doi.org/10.1007/s10589-015-9743-7) (_Computational Optimization and Applications_, 2015); there's also a super verbose working paper on the [arxiv](https://arxiv.org/abs/1012.5836). You can get the whole gist from the first paper, the second introduces finer grained details related to treatment of "budgets" in the choice model (under regularity conditions). The basic idea is that there is a _particular_ fixed-point equation for simultaneous stationarity (the _necessary_ conditions for equilibrium prices) that is provably norm-coercive and generates steps that are never orthogonal to the combined-gradient. Iterating such steps appears to be a strong, matix-inversion-free alternative to Newton-type methods as discussed at some length in the papers, although there is no convergence proof. 
 
 # Dependencies
 
@@ -28,6 +28,11 @@ You can run tests with
 just unit-test
 ```
 or review the standard-ish `pytest` command in the `justfile`. 
+
+Solver "tests" are different, and not formally conditions for code correctness. You can review them in `test/solver/test_solver.py` and/or run them with 
+```shell
+just solver-test --capture no
+```
 
 # Command-Line Usage
 

@@ -243,14 +243,12 @@ class FPISolverV2:
         self,
     ) -> None:
         """z <- \tilde{GAMp}' * m - P"""
+
         for f in range(self.F):
             fi = self.Fis[f]
             self.pr[f] = self.P[fi].dot(self.m[fi])  # for stats only?
-            # self.z[fi] = self.G[fi,fi].T.dot(self.m[fi]) - self.P[fi]
-            self.z[fi] = -self.P[fi]
-            for j in fi:
-                for k in fi:
-                    self.z[j] += self.G[k, j] * self.m[k]
+            self.z[fi] = self.G[np.ix_(fi,fi)].T.dot(self.m[fi]) - self.P[fi]
+
 
     def probabilities(self, p: NPArrayType) -> None:
 
