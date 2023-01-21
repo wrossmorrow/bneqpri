@@ -145,6 +145,10 @@ class LinearUtility(Utility):
 
 
 class LogOfRemainingUtility(Utility):
+    def sample(self, individuals: int) -> None:  # noqa: E741
+        super().sample(individuals)
+        self.A = self.a * np.ones((1, self.J))  # I x J column replication
+
     def __call__(self, p: NPArrayType) -> None:
         """For a[i] > 1, if p[j] < b[i] set
 
@@ -178,26 +182,40 @@ class LogOfRemainingUtility(Utility):
 
         """
         T = self.b - p.reshape(1, self.J)  # type: ignore
-        # TODO: very inefficient double loop; how to eliminate?
-        for i in range(self.I):
-            for j in range(self.J):
-                if T[i, j] > 0.0:  # tolerance, not just > 0.0?
-                    self.U[i, j] = self.a[i] * np.log(T[i, j]) + self.V[i, j]
-                    self.DpU[i, j] = -self.a[i] / T[i, j]
-                    self.DppU[i, j] = self.DpU[i, j] / T[i, j]
-                else:
-                    self.U[i, j] = -1.0e20
-                    self.DpU[i, j] = 0.0
-                    self.DppU[i, j] = -1.0 / self.a[i]
+        T0 = np.where(T <= 0)  # boolean I x J mask
+
+        self.U = self.A * np.log(T) + self.V  # U[i,j] == nan if T[i,j] <= 0
+        self.DpU = -self.A / T
+        self.DppU = self.DpU / T
+
+        self.U[T0] = -1.0e20  # effectively negative infinity
+        self.DpU[T0] = 0.0  # effective limit as p[j] -> b[i] in P, Lam, Gam
+        self.DppU[T0] = -1.0 / self.A[T0]  # correction, actually DppU[i,j]/DpU[i,j]^2
+
+        # # TODO: very inefficient double loop; how to eliminate?
+        # for i in range(self.I):
+        #     for j in range(self.J):
+        #         if T[i, j] > 0.0:  # tolerance, not just > 0.0?
+        #             self.U[i, j] = self.a[i] * np.log(T[i, j]) + self.V[i, j]
+        #             self.DpU[i, j] = -self.a[i] / T[i, j]
+        #             self.DppU[i, j] = self.DpU[i, j] / T[i, j]
+        #         else:
+        #             self.U[i, j] = -1.0e20
+        #             self.DpU[i, j] = 0.0
+        #             self.DppU[i, j] = -1.0 / self.a[i]
 
 
 class ReciprocalOfRemainingUtility(Utility):
+    def sample(self, individuals: int) -> None:  # noqa: E741
+        super().sample(individuals)
+        self.A = self.a * np.ones((1, self.J))  # I x J column replication
+
     def __call__(self, p: NPArrayType) -> None:
         """For any a[i] < 0
 
                U[i,j] = a[i] / (b[i]-p)      (-> -Inf as p -> b[i])
              DpU[i,j] = a[i] / (b[i]-p)^2    (-> -Inf as p -> b[i]) ==> a[i] < 0 required
-            DppU[i,j] = 2 a[i] / (b[i]-p)^3  (-> -Inf as p -> b[i]) 
+            DppU[i,j] = 2 a[i] / (b[i]-p)^3  (-> -Inf as p -> b[i])
 
         when p < b[i] but
 
@@ -211,13 +229,25 @@ class ReciprocalOfRemainingUtility(Utility):
         when p >= b[i] (we _store_ a ratio in DppU, not the actual value).
         """
         T = self.b - p.reshape(1, self.J)  # type: ignore
-        for i in range(self.I):
-            for j in range(self.J):
-                if T[i, j] > 0.0:  # tolerance, not just > 0.0?
-                    self.U[i, j] = self.a[i] / T[i, j] + self.V[i, j]
-                    self.DpU[i, j] = self.a[i] / (T[i, j] * T[i, j])
-                    self.DppU[i, j] = 2.0 * self.DpU[i, j] / T[i, j]
-                else:
-                    self.U[i, j] = -1.0e20
-                    self.DpU[i, j] = 0.0
-                    self.DppU[i, j] = 0.0
+        T0 = np.where(T <= 0)  # boolean I x J mask
+
+        AoT = self.A / T
+        self.U = AoT + self.V
+        self.DpU = AoT / T
+        self.DppU = 2.0 * self.DpU / T
+
+        self.U[T0] = -1.0e20  # effectively negative infinity
+        self.DpU[T0] = 0.0  # effective limit as p[j] -> b[i] in P, Lam, Gam
+        self.DppU[T0] = 0.0  # correction, actually DppU[i,j]/DpU[i,j]^2
+
+        # # TODO: very inefficient double loop; how to eliminate?
+        # for i in range(self.I):
+        #     for j in range(self.J):
+        #         if T[i, j] > 0.0:  # tolerance, not just > 0.0?
+        #             self.U[i, j] = self.a[i] / T[i, j] + self.V[i, j]
+        #             self.DpU[i, j] = self.a[i] / (T[i, j] * T[i, j])
+        #             self.DppU[i, j] = 2.0 * self.DpU[i, j] / T[i, j]
+        #         else:
+        #             self.U[i, j] = -1.0e20
+        #             self.DpU[i, j] = 0.0
+        #             self.DppU[i, j] = 0.0

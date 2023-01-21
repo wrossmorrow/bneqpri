@@ -82,7 +82,7 @@ class AVIndependentSampler(ABVIndependentSampler):
         super().__init__(a_sampler, None, V_sampler)
 
 
-class LogNormalABNormalVSampler(ABVIndependentSampler):
+class LognormalABNormalVSampler(ABVIndependentSampler):
     """Log normal a and b, but normal V. a coefficients may be negated.
 
 
@@ -111,7 +111,7 @@ class LogNormalABNormalVSampler(ABVIndependentSampler):
         super().__init__(a_dist, b_dist, V_dist)
 
 
-class LogNormalABNormalWXSampler(ABVIndependentSampler):
+class LognormalABNormalWXSampler(ABVIndependentSampler):
     """Log normal a and b, but normal V derived from some data matrix X
     of "product characteristics" and a multivariate normal weight matrix.
     """

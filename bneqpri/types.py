@@ -27,16 +27,19 @@ class Market:
 
 
 class NPDistribution:
-    def __init__(self, name: str, params: Tuple[Any, ...], negate: bool = False) -> None:
+    def __init__(
+        self, name: str, params: Tuple[Any, ...], negate: bool = False, shift: float = 0.0
+    ) -> None:
         self._name = name
         self._params = params
         self._sign = -1 if negate else 1
+        self._shift = shift
         self._rng = default_rng()
         assert hasattr(self._rng, self._name)
         self._call = getattr(self._rng, self._name)
 
     def __call__(self, I: int) -> ABVSamples:  # noqa: #741
-        return self._sign * self._call(*self._params, size=I)
+        return self._sign * self._call(*self._params, size=I) + self._shift
 
 
 class NormalDistribution(NPDistribution):
@@ -50,8 +53,8 @@ class MVNDistribution(NPDistribution):
 
 
 class LognormalDistribution(NPDistribution):
-    def __init__(self, mu: float, sigma: float, negate: bool = False) -> None:
-        super().__init__("lognormal", (mu, sigma), negate=negate)
+    def __init__(self, mu: float, sigma: float, negate: bool = False, shift: float = 0.0) -> None:
+        super().__init__("lognormal", (mu, sigma), negate=negate, shift=shift)
 
 
 class BetaDistribution(NPDistribution):

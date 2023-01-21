@@ -5,3 +5,6 @@ __pycache__
 *egg*
 /dist
 /build
+
+.mypy_cache
+.pytest_cache

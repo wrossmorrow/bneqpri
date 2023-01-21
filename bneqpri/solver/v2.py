@@ -366,97 +366,97 @@ class FPISolverV2:
             print("  %0.8e: %0.2f %0.10f" % (H, np.log10(dh[h]), dh[h]))
 
 
+# TBD: naive batching does _not_ work (yet)
 
-class BatchedFPISolverV2(FPISolverV2):
+# class BatchedFPISolverV2(FPISolverV2):
+#     def solve(
+#         self,
+#         samples: int,  # _required_ (unless fixed sampling?)
+#         initial_prices: Optional[NPArrayType] = None,
+#         tolerance: float = 1.0e-6,
+#         max_iter: int = 1000,
+#         corrected: bool = True,
+#         memory: int = 10,  # violates liskov sub principle
+#         verbose: bool = False,
+#         check: bool = False,
+#     ) -> NPArrayType:
 
-    def solve(
-        self,
-        samples: int,  # _required_ (unless fixed sampling?)
-        initial_prices: Optional[NPArrayType] = None,
-        tolerance: float = 1.0e-6,
-        max_iter: int = 1000,
-        corrected: bool = True,
-        memory: int = 10,
-        verbose: bool = False,
-        check: bool = False,
-    ) -> NPArrayType:
+#         # for (annoying but maybe usefuul) consistency with math notation
+#         I = samples  # noqa: E741
 
-        # for (annoying but maybe usefuul) consistency with math notation
-        I = samples  # noqa: E741
+#         # random prices in [ c/2 , 3/2c ] if not specified
+#         p = (
+#             initial_prices
+#             if initial_prices is not None
+#             else ((0.5 + np.random.random(self.J)) * self.c)
+#         )
 
-        # random prices in [ c/2 , 3/2c ] if not specified
-        p = (
-            initial_prices
-            if initial_prices is not None
-            else (self.c / 2.0 + 2.0 * np.random.random(self.J))
-        )
+#         # sample parameters needed to compute
+#         self.PL = np.zeros((I, self.J))  # logit probabilities (idiosyncratic)
+#         self.DpUPL = np.zeros((I, self.J))  # for Lambda/Gamma compute
 
-        # sample parameters needed to compute
-        self.PL = np.zeros((I, self.J))  # logit probabilities (idiosyncratic)
-        self.DpUPL = np.zeros((I, self.J))  # for Lambda/Gamma compute
+#         # define reference to corrected or uncorrected step
+#         _corrected = corrected and (self.utility.b is not None)
+#         step = self.zeta_c if _corrected else self.zeta_u
 
-        # define reference to corrected or uncorrected step
-        _corrected = corrected and (self.utility.b is not None)
-        step = self.zeta_c if _corrected else self.zeta_u
+#         Zs = np.zeros((self.J, memory))
+#         Ws = np.zeros(memory)
+#         _m = 0
 
-        Zs = np.zeros((self.J, memory))
-        Ws = np.zeros(memory)
-        _m = 0
+#         self.max_iter = max_iter
+#         self.nrms = np.zeros((max_iter, 2))
+#         self.solved = False
+#         self.stats = []
+#         start = time()
+#         for self.iter in range(self.max_iter):
 
-        self.max_iter = max_iter
-        self.nrms = np.zeros((max_iter, 2))
-        self.solved = False
-        self.stats = []
-        start = time()
-        for self.iter in range(self.max_iter):
+#             if check:
+#                 self.probcheck(p)
+#                 self.gradcheck(p)
 
-            if check:
-                self.probcheck(p)
-                self.gradcheck(p)
+#             self.utility.sample(I)
 
-            self.utility.sample(I)
+#             # compute "step", ie the (corrected?) zeta map
+#             step(p, verbose=verbose)
 
-            # compute "step", ie the (corrected?) zeta map
-            step(p, verbose=verbose)
+#             # test convergence (using step, not combined gradient)
+#             self.nrms[self.iter, 0] = np.max(np.abs(self.phi))
+#             self.nrms[self.iter, 1] = np.max(np.abs(self.L * self.phi))
 
-            # test convergence (using step, not combined gradient)
-            self.nrms[self.iter, 0] = np.max(np.abs(self.phi))
-            self.nrms[self.iter, 1] = np.max(np.abs(self.L * self.phi))
+#             self.stats.append(
+#                 [
+#                     self.iter,
+#                     time() - start,
+#                     p.min(),
+#                     p.max(),
+#                     self.pr.min(),
+#                     self.pr.max(),
+#                     self.P.sum(),
+#                     self.nrms[self.iter, 0],
+#                     self.nrms[self.iter, 1],
+#                 ]
+#             )
 
-            self.stats.append(
-                [
-                    self.iter,
-                    time() - start,
-                    p.min(),
-                    p.max(),
-                    self.pr.min(),
-                    self.pr.max(),
-                    self.P.sum(),
-                    self.nrms[self.iter, 0],
-                    self.nrms[self.iter, 1],
-                ]
-            )
+#             if verbose:
+#                 self.profits(p)
+#                 self._progress(p)
 
-            if verbose:
-                self.profits(p)
-                self._progress(p)
+#             if self.nrms[self.iter, 0] <= tolerance:
+#                 self.solved = True
+#                 break
 
-            if self.nrms[self.iter, 0] <= tolerance:
-                self.solved = True
-                break
+#             # fixed-point step, equivalently p -> p - phi = p - ( p - c - z )
+#             # but batched with memory
+#             Ws = Ws - 1  # decrement existing weights
+#             Ws[_m] = memory  # set weight of new entry
+#             Zs[:, _m] = self.z[:]  # highest weight sample is current
+#             _m = 0 if _m == memory - 1 else (_m + 1)
+#             s = Zs @ (Ws / Ws.sum())
+#             print(Ws, s, self.z)
+#             p = self.c + s
 
-            # fixed-point step, equivalently p -> p - phi = p - ( p - c - z )
-            # but batched with memory
-            Ws = Ws - 1 # decrement existing weights
-            Ws[_m] = memory # set weight of new entry
-            Zs[:,_m] = self.z[:] # highest weight sample is current
-            _m = 0 if _m == memory-1 else (_m+1)
-            s = Zs @ (Ws/Ws.sum())
-            print(Ws, s, self.z)
-            p = self.c + s
+#         self.time = time() - start
 
-        self.time = time() - start
+#         self.nrms = self.nrms[: self.iter + 1, :]
 
-        self.nrms = self.nrms[: self.iter + 1, :]
-
-        return p
+#         return p

@@ -43,6 +43,13 @@ unit-test *flags:
         test/unit \
         --disable-warnings \
         {{flags}}
+
+# run all solver tests
+solver-test *flags:
+    poetry run python -m pytest -v \
+        test/solver \
+        --disable-warnings \
+        {{flags}}
             
 # run all integration tests
 integration-test *flags:
