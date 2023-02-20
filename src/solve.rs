@@ -7,16 +7,17 @@ use crate:stats;
 pub struct FPISolver{
 
     pub firms: &Vec<Firm>,
-    pub utility: &Utility,
+    pub utility: &Utility, // "whatever has the traits"
     pub stats: SolveStats,
+
+    // NOTE: can move to market data
 
     Fi: Vec<(usize, usize)>, // "[)" style indices segmenting (ordered) firm blocks
 
     F: u32, // number of firms (firms.len())
     J: u32, // firms.iter().map(|f| f.products).sum()
     Jf: Vec<u32>, // F long, Jf[f] = firms[f].products
-    c: Vec<f64>, // organized by mapper, c.len() == J
-    V: Vec<f64>, // organized by mapper, V.len() == J? Matrix not vector?
+    c: Vec<f64>, // c.len() == J
     m: Vec<f64>, // markups, m.len() == J
     pr: Vec<f64>, // profits, pr.len() == F
     P: Vec<f64>, // probabilities, P.len() == J
@@ -26,16 +27,50 @@ pub struct FPISolver{
     phi: Vec<f64>, // "phi" map (p - c - z(p)), phi.len() == J
     cg: Vec<f64>, // combined gradient (Lam(p) * phi(p)), cg.len() == J
 
-    I: u32, // # "individuals"
-    U: Vec<f64>, // zeros?
-    uimax: Vec<f64>, // for expfloat corrections
-    bimax: Vec<f64>, // for budget corrections
+    // NOTE: can move to model data
+
+    I: u32, // "individuals" (sample size)
+    V: Vec<f64>, // V.len() == I x J
+    U: Vec<f64>, // U.len() == I x J
+    uimax: Vec<f64>, // uimax.len() == I, for expfloat corrections
+    bimax: usize, // for budget corrections
     bmax: f64, // for budget corrections
-    DpU: Vec::<f64>, // zeros?
-    DpUPL: Vec::<f64>, // zeros?
-    PL: Vec::<f64>, // zeros?
+    DpU: Vec::<f64>, // DpU.len() == I x J
+    DppU: Vec::<f64>, // DppU.len() == I x J
+    DpUPL: Vec::<f64>, // DpUPL.len() == I x J
+    PL: Vec::<f64>, // PL.len() == I x J
 
 }
+
+pub struct FPISolverMarketData {
+    Fi: Vec<(usize, usize)>, // "[)" style indices segmenting (ordered) firm blocks
+    F: u32, // number of firms (firms.len())
+    J: u32, // firms.iter().map(|f| f.products).sum()
+    Jf: Vec<u32>, // F long, Jf[f] = firms[f].products
+    c: Vec<f64>, // c.len() == J
+    m: Vec<f64>, // markups, m.len() == J
+    pr: Vec<f64>, // profits, pr.len() == F
+    P: Vec<f64>, // probabilities, P.len() == J
+    L: Vec<f64>, // Lambda "matrix" (diagonals), L.len() == J
+    G: Vec<f64>, // Gamma matrix, G.len() == J x J
+    z: Vec<f64>, // probabilities, P.len() == J
+    phi: Vec<f64>, // "phi" map (p - c - z(p)), phi.len() == J
+    cg: Vec<f64>, // combined gradient (Lam(p) * phi(p)), cg.len() == J
+}
+
+pub struct FPISolverModelData {
+    I: u32, // "individuals" (sample size)
+    V: Vec<f64>, // V.len() == I x J
+    U: Vec<f64>, // U.len() == I x J
+    uimax: Vec<f64>, // uimax.len() == I, for expfloat corrections
+    bimax: usize, // for budget corrections
+    bmax: f64, // for budget corrections
+    DpU: Vec::<f64>, // DpU.len() == I x J
+    DppU: Vec::<f64>, // DppU.len() == I x J
+    DpUPL: Vec::<f64>, // DpUPL.len() == I x J
+    PL: Vec::<f64>, // PL.len() == I x J
+}
+
 
 impl FPISolver {
 
@@ -67,10 +102,12 @@ impl FPISolver {
             phi: Vec::<f64>::with_capacity(J), // zeros?
             cg: Vec::<f64>::with_capacity(J), // zeros?
 
+            // NOTE/TODO: can't assign the below until sample size known
+
             I: I, // "individuals"; 
             U: Vec::<f64>::with_capacity(I*J), // zeros?
-            uimax: Vec::<f64>::with_capacity(J), // for expfloat corrections
-            bimax: Vec::<f64>::with_capacity(I), // for budget corrections
+            uimax: Vec::<f64>::with_capacity(I), // for expfloat corrections
+            bimax: 0_usize, // for budget corrections
             bmax: 0.0_f64, // for budget corrections
             DpU: Vec::<f64>::with_capacity(I*J), // zeros?
             DpUPL: Vec::<f64>::with_capacity(I*J), // zeros?
