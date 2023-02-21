@@ -493,12 +493,11 @@ impl FPISolver<'_> {
 mod tests {
 
     use super::*;
-    use rand_distr::{LogNormal, Normal};
     use rand::Rng;
+    use rand_distr::{LogNormal, Normal};
 
     #[test]
     fn test_solver() {
-
         let I = 10;
         let F = 3;
         let K = 5;
@@ -527,8 +526,5 @@ mod tests {
             Ok(stats) => println!("{}", stats.unwrap().latest()),
             Err(stats) => assert!(false),
         }
-
     }
-
 }
-

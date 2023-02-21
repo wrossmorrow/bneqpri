@@ -143,8 +143,15 @@ pub struct LORUUtility<'u, AD: Distribution<f64>, BD: Distribution<f64>, WD: Dis
     W_dist: &'u WD,
 }
 
-impl<AD: Distribution<f64>, BD: Distribution<f64>, WD: Distribution<f64>> LORUUtility<'_, AD, BD, WD> {
-    pub fn new<'u>(K: usize, a_dist: &'u AD, b_dist: &'u BD, W_dist: &'u WD) -> LORUUtility<'u, AD, BD, WD> {
+impl<AD: Distribution<f64>, BD: Distribution<f64>, WD: Distribution<f64>>
+    LORUUtility<'_, AD, BD, WD>
+{
+    pub fn new<'u>(
+        K: usize,
+        a_dist: &'u AD,
+        b_dist: &'u BD,
+        W_dist: &'u WD,
+    ) -> LORUUtility<'u, AD, BD, WD> {
         return LORUUtility::<'u, AD, BD, WD> {
             I: 0,
             K: K,
@@ -158,7 +165,9 @@ impl<AD: Distribution<f64>, BD: Distribution<f64>, WD: Distribution<f64>> LORUUt
     }
 }
 
-impl<AD: Distribution<f64>, BD: Distribution<f64>, WD: Distribution<f64>> Utility for LORUUtility<'_, AD, BD, WD> {
+impl<AD: Distribution<f64>, BD: Distribution<f64>, WD: Distribution<f64>> Utility
+    for LORUUtility<'_, AD, BD, WD>
+{
     fn sample(&mut self, I: usize) -> Option<(usize, f64)> {
         self.I = I;
         self.a = linalg::zeros(I, 1);

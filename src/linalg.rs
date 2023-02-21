@@ -29,5 +29,5 @@ pub fn randmat(M: usize, N: usize, l: f64, u: f64) -> Vec<f64> {
     return A;
 }
 
-// TODO: we could test these things but also we're probably 
+// TODO: we could test these things but also we're probably
 // going to use ndarray
