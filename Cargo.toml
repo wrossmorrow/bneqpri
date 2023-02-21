@@ -1,0 +1,20 @@
+[package]
+name = "bneqpri"
+version = "0.1.0"
+authors = ["morrowwr@gmail.com"]
+edition = "2021"
+
+[dependencies]
+rand = "0.8"
+pyo3 = "0.18.0"
+rand_distr = "0.4.3"
+
+# { version = "0.18.0", features = ["extension-module"] }
+
+[features]
+extension-module = ["pyo3/extension-module"]
+default = ["extension-module"]
+
+[lib]
+name = "_bneqpri"
+crate-type = ["cdylib", "rlib"]

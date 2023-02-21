@@ -19,6 +19,14 @@ install:
 update: 
     poetry update
 
+# poetry python
+python:
+    poetry run python
+
+# maturin rust python env
+maturin *CMDS:
+    poetry run maturin {{CMDS}}
+
 # format the code
 format: 
     poetry run black {{name}}
@@ -33,9 +41,17 @@ lint:
     poetry run black {{name}} test --check --exclude env
     poetry run flake8 {{name}} test
     poetry run mypy {{name}} test
-    
+
+# run examples
 examples:
     poetry run bash ./examples.sh
+
+rust-fmt:
+    cargo fmt
+
+# run all rust code tests
+rust-test *FLAGS:
+    cargo test --no-default-features {{FLAGS}}
 
 # run all unit tests
 unit-test *flags:

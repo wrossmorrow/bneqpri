@@ -1,10 +1,10 @@
-
-pub mod FPISolver_v3alpha1;
+// pub mod FPISolver_v3alpha1;
 
 mod firm;
-mod utility;
+mod linalg;
 mod options;
-mod stats;
 mod solve;
+mod stats;
+mod utility;
 
 // TODO: python interface
