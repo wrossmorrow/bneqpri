@@ -102,7 +102,7 @@ impl fmt::Display for FPIIterStat {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-            "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}",
+            "{}\t{}\t{}\t{:0.4}\t{:0.4}\t{:0.4}\t{:0.4}\t{:0.4}\t{:0.8}\t{:0.8}",
             self.iter,
             self.elapsed_time_us,
             self.iter_time_us,

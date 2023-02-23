@@ -3,6 +3,8 @@
 
 use rand::distributions::Distribution;
 use rand::Rng;
+use rand_distr::num_traits::Float;
+use rand_distr::{Normal, NormalError, StandardNormal};
 
 use crate::linalg;
 
@@ -132,13 +134,104 @@ impl<AD: Distribution<f64>, WD: Distribution<f64>> Utility for LinUtility<'_, AD
     }
 }
 
+// A shifted log-normal distribution, 
+//
+//     ln( X - shift ) = N(m, s**2)
+//
+// instead of just ln X. This is important for the LORU model, 
+// wherein we have to have price coefficients > 1. 
+#[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "serde1", derive(serde::Serialize, serde::Deserialize))]
+pub struct ShiftedLogNormal<F>
+where
+    F: Float,
+    StandardNormal: Distribution<F>,
+{
+    norm: Normal<F>,
+    shift: F,
+}
+
+impl<F> ShiftedLogNormal<F>
+where
+    F: Float,
+    StandardNormal: Distribution<F>,
+{
+    #[inline]
+    pub fn new(mu: F, sigma: F, shift: F) -> Result<ShiftedLogNormal<F>, NormalError> {
+        let norm = Normal::new(mu, sigma)?;
+        Ok(ShiftedLogNormal { norm, shift })
+    }
+
+    #[inline]
+    pub fn from_mean_cv(mean: F, cv: F, shift: F) -> Result<ShiftedLogNormal<F>, NormalError> {
+        if cv == F::zero() {
+            let mu = mean.ln();
+            let norm = Normal::new(mu, F::zero()).unwrap();
+            return Ok(ShiftedLogNormal { norm, shift });
+        }
+        if !(mean > F::zero()) {
+            return Err(NormalError::MeanTooSmall);
+        }
+        if !(cv >= F::zero()) {
+            return Err(NormalError::BadVariance);
+        }
+
+        let a = F::one() + cv * cv; // e
+        let mu = F::from(0.5).unwrap() * (mean * mean / a).ln();
+        let sigma = a.ln().sqrt();
+        let norm = Normal::new(mu, sigma)?;
+        Ok(ShiftedLogNormal { norm, shift })
+    }
+
+    #[inline]
+    pub fn from_zscore(&self, zscore: F) -> F {
+        self.norm.from_zscore(zscore).exp()
+    }
+}
+
+impl<F> Distribution<F> for ShiftedLogNormal<F>
+where
+    F: Float,
+    StandardNormal: Distribution<F>,
+{
+    #[inline]
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> F {
+        self.shift + self.norm.sample(rng).exp()
+    }
+}
+
+// This would be MUCH better but does not work, trait object with
+// a generic is not object safe and can't be stored in another struct
+
+// struct ShiftedDistribution<'a, T: Copy>
+// {
+//     b: T,
+//     d: &'a dyn Distribution<T>
+// }
+
+// // + rand_distr::num_traits::Float
+// impl<'a, T: Copy> ShiftedDistribution<'a, T> {
+//     fn new(d: &'a dyn Distribution<T>, b: T) -> ShiftedDistribution<'a, T> {
+//         return ShiftedDistribution::<'a, T> {b: b, d: d}
+//     }
+// }
+
+// impl<'a, T: Copy> Distribution<T> for ShiftedDistribution<'a, T> {
+//     fn sample<R>(&self, rng: &mut R) -> T
+//     where
+//         R: Rng + ?Sized,
+//     {
+//         self.b + self.d.sample(rng)
+//     }
+// }
+
 pub struct LORUUtility<'u, AD: Distribution<f64>, BD: Distribution<f64>, WD: Distribution<f64>> {
     I: usize,
     K: usize,
-    a: Vec<f64>, // I vector
-    b: Vec<f64>, // I vector
-    W: Vec<f64>, // I x K matrix
-    a_dist: &'u AD,
+    a: Vec<f64>,    // I vector
+    b: Vec<f64>,    // I vector
+    W: Vec<f64>,    // I x K matrix
+    a_dist: &'u AD, // technically, we require a > 1 almost surely...
     b_dist: &'u BD,
     W_dist: &'u WD,
 }
@@ -272,10 +365,69 @@ pub struct RORUUtility {}
 mod tests {
 
     use super::*;
-    use rand_distr::{LogNormal, Normal};
+    use rand_distr::{Distribution, LogNormal, Normal};
+
+    struct Constant<T: Copy> {
+        v: T,
+    }
+
+    impl<T: Copy> Constant<T> {
+        fn new(v: T) -> Constant<T> {
+            Constant::<T> { v: v }
+        }
+    }
+
+    impl<T: Copy> Distribution<T> for Constant<T> {
+        fn sample<R>(&self, rng: &mut R) -> T
+        where
+            R: Rng + ?Sized,
+        {
+            self.v
+        }
+    }
 
     #[test]
-    fn test_lin_u() {
+    fn test_linu_simple() {
+        let I: usize = 1;
+        let J: usize = 1;
+        let K: usize = 1;
+
+        let p = linalg::ones(J, 1);
+        let X = linalg::ones(K, J);
+
+        let a_dist = Constant::new(2.0);
+        let W_dist = Constant::new(1.0);
+
+        let mut lu = LinUtility::<Constant<f64>, Constant<f64>>::new(K, &a_dist, &W_dist);
+
+        let mut V = linalg::zeros(I, J);
+        let mut U = linalg::zeros(I, J);
+        let mut DpU = linalg::zeros(I, J);
+        let mut DppU = linalg::zeros(I, J);
+
+        match lu.sample(I) {
+            Some(_) => assert!(false),
+            None => (),
+        };
+
+        lu.values(J, &X, &mut V); // compute values from samples (W @ X)
+        assert!(V[0] == 1.0);
+
+        lu.eval_UpD0(&p, &mut U);
+        assert!(U[0] == -2.0);
+
+        lu.eval_UpD1(&p, &mut U, &mut DpU);
+        assert!(U[0] == -2.0);
+        assert!(DpU[0] == -2.0);
+
+        lu.eval_UpD2(&p, &mut U, &mut DpU, &mut DppU);
+        assert!(U[0] == -2.0);
+        assert!(DpU[0] == -2.0);
+        assert!(DppU[0] == 0.0);
+    }
+
+    #[test]
+    fn test_linu() {
         let I: usize = 2;
         let J: usize = 10;
         let K: usize = 10;
@@ -286,12 +438,12 @@ mod tests {
         let a_dist = LogNormal::<f64>::new(2.0, 3.0).unwrap();
         let W_dist = Normal::<f64>::new(0.0, 1.0).unwrap();
 
+        let mut lu = LinUtility::<LogNormal<f64>, Normal<f64>>::new(K, &a_dist, &W_dist);
+
         let mut V = linalg::zeros(I, J);
         let mut U = linalg::zeros(I, J);
         let mut DpU = linalg::zeros(I, J);
         let mut DppU = linalg::zeros(I, J);
-
-        let mut lu = LinUtility::<LogNormal<f64>, Normal<f64>>::new(K, &a_dist, &W_dist);
 
         match lu.sample(I) {
             Some(_) => assert!(false),
@@ -343,6 +495,121 @@ mod tests {
         for i in 0..I {
             for j in 0..J {
                 assert!(DppU[I * j + i] == 0.0);
+            }
+        }
+    }
+
+    #[test]
+    fn test_loru_simple() {
+        let I: usize = 1;
+        let J: usize = 1;
+        let K: usize = 1;
+
+        let p = linalg::ones(J, 1);
+        let X = linalg::ones(K, J);
+
+        let a: f64 = 2.0;
+        let b: f64 = 3.0;
+
+        let a_dist = Constant::new(a);
+        let b_dist = Constant::new(b);
+        let W_dist = Constant::new(1.0);
+        let ri: f64 = b - p[0];
+
+        let mut loru = LORUUtility::<Constant<f64>, Constant<f64>, Constant<f64>>::new(
+            K, &a_dist, &b_dist, &W_dist,
+        );
+
+        let mut V = linalg::zeros(I, J);
+        let mut U = linalg::zeros(I, J);
+        let mut DpU = linalg::zeros(I, J);
+        let mut DppU = linalg::zeros(I, J);
+
+        match loru.sample(I) {
+            Some(_) => (),
+            None => assert!(false),
+        };
+
+        loru.values(J, &X, &mut V); // compute values from samples (W @ X)
+        assert!(V[0] == 1.0_f64);
+
+        loru.eval_UpD0(&p, &mut U);
+        assert!(U[0] == a * ri.ln());
+
+        loru.eval_UpD1(&p, &mut U, &mut DpU);
+        assert!(U[0] == a * ri.ln());
+        assert!(DpU[0] == -a / ri);
+
+        loru.eval_UpD2(&p, &mut U, &mut DpU, &mut DppU);
+        assert!(U[0] == a * ri.ln());
+        assert!(DpU[0] == -a / ri);
+        assert!(DppU[0] == -a / ri / ri);
+    }
+
+    #[test]
+    fn test_loru() {
+        let I: usize = 2;
+        let J: usize = 10;
+        let K: usize = 10;
+
+        let p = linalg::randmat(J, 1, 0.0, 1.0);
+        let X = linalg::randmat(K, J, -1.0, 1.0);
+
+        let a_dist = ShiftedLogNormal::<f64>::new(2.0, 3.0, 1.0).unwrap();
+        let b_dist = LogNormal::<f64>::new(10.0, 100.0).unwrap();
+        let W_dist = Normal::<f64>::new(0.0, 1.0).unwrap();
+
+        let mut loru = LORUUtility::<ShiftedLogNormal<f64>, LogNormal<f64>, Normal<f64>>::new(
+            K, &a_dist, &b_dist, &W_dist,
+        );
+
+        let mut V = linalg::zeros(I, J);
+        let mut U = linalg::zeros(I, J);
+        let mut DpU = linalg::zeros(I, J);
+        let mut DppU = linalg::zeros(I, J);
+
+        match loru.sample(I) {
+            Some(_) => (),
+            None => assert!(false),
+        };
+
+        loru.values(J, &X, &mut V); // compute values from samples (W @ X)
+        for i in 0..I {
+            for j in 0..J {
+                assert!(V[I * j + i] != 0.0);
+            }
+        }
+
+        loru.eval_UpD0(&p, &mut U);
+        for i in 0..I {
+            for j in 0..J {
+                if p[j] < loru.b[i] {
+                    assert!(U[I * j + i] != 0.0);
+                } else {
+                    assert!(U[I * j + i] == -1.0e20);
+                }
+            }
+        }
+
+        loru.eval_UpD1(&p, &mut U, &mut DpU);
+        for i in 0..I {
+            for j in 0..J {
+                if p[j] < loru.b[i] {
+                    assert!(DpU[I * j + i] != 0.0);
+                } else {
+                    assert!(DpU[I * j + i] == 0.0);
+                }
+            }
+        }
+
+        loru.eval_UpD2(&p, &mut U, &mut DpU, &mut DppU);
+        for i in 0..I {
+            for j in 0..J {
+                if p[j] < loru.b[i] {
+                    assert!(DppU[I * j + i] != 0.0);
+                } else {
+                    assert!(DppU[I * j + i] == -1.0 / loru.a[i]);
+                }
             }
         }
     }
